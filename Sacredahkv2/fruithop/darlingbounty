@@ -8,7 +8,7 @@ local SCRIPTS = {
     -------------------------------------------------------------------------
     ["SACRED AHK V2"] = function()
         -- ▼▼▼ PEGA TU LOADSTRING AQUÍ ▼▼▼
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/lol123rivals-dotcom/random3/refs/heads/main/message(3).txt"))()
+        loadstring(game:HttpGet(""))()
         -- ▲▲▲ FIN DE SACRED AHK V2 ▲▲▲
     end,
 
