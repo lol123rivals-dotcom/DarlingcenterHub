@@ -8,7 +8,7 @@ local SCRIPTS = {
     -------------------------------------------------------------------------
     ["SACRED AHK V2"] = function()
         -- ▼▼▼ PEGA TU LOADSTRING AQUÍ ▼▼▼
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/..."))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/lol123rivals-dotcom/random3/refs/heads/main/message(3).txt"))()
         -- ▲▲▲ FIN DE SACRED AHK V2 ▲▲▲
     end,
 
@@ -26,7 +26,7 @@ local SCRIPTS = {
     -------------------------------------------------------------------------
     ["FRUIT HOP"] = function()
         -- ▼▼▼ PEGA TU LOADSTRING AQUÍ ▼▼▼
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/..."))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/lol123rivals-dotcom/random2-/refs/heads/main/message(2).txt"))()
         -- ▲▲▲ FIN DE FRUIT HOP ▲▲▲
     end,
 }
