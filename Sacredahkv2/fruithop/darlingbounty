@@ -17,7 +17,7 @@ local SCRIPTS = {
     -------------------------------------------------------------------------
     ["DARLING BOUNTY"] = function()
         -- ▼▼▼ PEGA TU LOADSTRING AQUÍ ▼▼▼
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/lol123rivals-dotcom/randomstuff/refs/heads/main/message(1).txt"))()
+        loadstring(game:HttpGet(""))()
         -- ▲▲▲ FIN DE DARLING BOUNTY ▲▲▲
     end,
 
