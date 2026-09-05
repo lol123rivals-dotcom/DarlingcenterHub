@@ -26,7 +26,7 @@ local SCRIPTS = {
     -------------------------------------------------------------------------
     ["FRUIT HOP"] = function()
         -- ▼▼▼ PEGA TU LOADSTRING AQUÍ ▼▼▼
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/lol123rivals-dotcom/random2-/refs/heads/main/message(2).txt"))()
+        loadstring(game:HttpGet(""))()
         -- ▲▲▲ FIN DE FRUIT HOP ▲▲▲
     end,
 }
